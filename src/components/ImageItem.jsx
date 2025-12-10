@@ -8,10 +8,10 @@ function ImageItem({ data, textureCache }) {
   // Ảnh này có đang được hover không?
   const [hovered, setHovered] = useState(false);
 
-  // Nạp ảnh
-  // const texture = useLoader(THREE.TextureLoader, data.thumb_path);
+  // Kiểm tra và lấy ra data.thumb_path từ textureCache truyền vào
   const cached = textureCache?.[data.thumb_path];
-
+  // Nếu cached có -> Sử dụng cached
+  // Nếu không có -> load lại từng ảnh từ data.thumb_path
   const texture = cached || useLoader(THREE.TextureLoader, data.thumb_path);
 
   // Lấy vị trí

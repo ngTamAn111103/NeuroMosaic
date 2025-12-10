@@ -23,23 +23,29 @@ function App() {
 
   // State lưu số lượng ảnh hiện tại
   const [imageCount, setImageCount] = useState(20);
-  // Giới hạn số lượng ảnh hiển thị
+  // Danh sách ảnh render thực tế
   const visibleImages = data_images.slice(0, imageCount);
   // Có đang load ảnh của step tiếp theo không
   const [isLoadingNextBatch, setIsLoadingNextBatch] = useState(false);
-  // Lưu cache + neo cho ImageItem để không phải chớp tắt
+  // Bộ nhớ cache cho ảnh
   const textureCache = useRef({});
 
   // Load trước số ảnh step cho bước tiếp theo
   useEffect(() => {
     const preloadNextBatch = async () => {
-      setIsLoadingNextBatch(true);
+      setIsLoadingNextBatch(true); // Cập nhật trạng thái để khoá nút tăng
+
+      // Cắt ra STEP_IMAGE ảnh tiếp theo
       const next = data_images.slice(imageCount, imageCount + STEP_IMAGE);
+      // Chuẩn bị TextureLoader
       const loader = new THREE.TextureLoader();
 
+      // Promise.all: Chờ tất cả ảnh bên trong hoàn tất mới đi tiếp
       await Promise.all(
+        // Duyệt từng ảnh trong next
         next.map(
           (img) =>
+            // Tạo ra Promise con
             new Promise((resolve) => {
               // Nếu đã cache rồi thì bỏ qua
               if (textureCache.current[img.thumb_path]) return resolve();
@@ -62,7 +68,7 @@ function App() {
     };
 
     preloadNextBatch();
-  }, [imageCount]);
+  }, [imageCount]); // imageCount tăng giảm đều gọi hàm này
 
   return (
     <>
