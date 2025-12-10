@@ -11,30 +11,45 @@ import layoutConfig from "../layoutConfig.json";
 
 // Component
 import ImageItem from "./components/ImageItem";
+import UIOverlay from "./components/UIOverlay";
 
 function App() {
-  // 🔹 State lưu mode hiện tại
+  // State lưu mode hiện tại
   const [currentMode, setCurrentMode] = useState("grid");
   const config = layoutConfig[currentMode];
 
+  // State lưu số lượng ảnh hiện tại
+  const [imageCount, setImageCount] = useState(20);
+
   return (
     <>
-      <div className="h-screen w-full bg-black">
+      <div className="relative h-screen w-full overflow-hidden bg-gray-900">
+        {/* 🔹 UI Overlay */}
+        <UIOverlay
+          currentLayout={currentMode}
+          setLayout={setCurrentMode}
+          imageCount={imageCount}
+          setImageCount={setImageCount}
+          min={20}
+          max={Math.min(200, data_images.length)}
+        />
         {/* Toàn bộ không gian 3D */}
 
-        <Canvas camera={{ position: config.cameraPosition, fov:config.cameraFov }} >
+        <Canvas
+          camera={{ position: config.cameraPosition, fov: config.cameraFov }}
+        >
           {/* Ánh sáng */}
           <ambientLight intensity={1} />
           <Stars
-          radius={100}
-          depth={100}
-          count={3000}
-          factor={3}
-          saturation={1}
-          fade
-          speed={0.5}
-        />
-          {data_images.map((img) => (
+            radius={100}
+            depth={100}
+            count={3000}
+            factor={3}
+            saturation={1}
+            fade
+            speed={0.5}
+          />
+          {data_images.slice(0, imageCount).map((img) => (
             <ImageItem key={img.id} data={img} />
           ))}
 
@@ -43,7 +58,6 @@ function App() {
             enablePan={config.OrbitControlsPan}
             panSpeed={config.OrbitControlSpanSpeed}
             enableRotate={config.OrbitControlsRotate}
-
           />
         </Canvas>
       </div>
@@ -54,4 +68,4 @@ function App() {
 export default App;
 // TODO: tương tác click vào ảnh
 // TODO: Đổi mode
-// TODO: 
+// TODO:
