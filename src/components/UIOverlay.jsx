@@ -3,7 +3,12 @@ import React, { useState } from "react";
 // Danh sách Layout (Bạn có thể thêm thoải mái vào đây sau này)
 const LAYOUTS = [
   { id: "sphere", label: "Sphere", desc: "Cấu trúc hình cầu", icon: "🌍" },
-  { id: "circle", label: "Circle", desc: "Vòng tròn đơn/Cưỡi ngựa xem hoa", icon: "⭕" },
+  {
+    id: "circle",
+    label: "Circle",
+    desc: "Vòng tròn đơn/Cưỡi ngựa xem hoa",
+    icon: "⭕",
+  },
   { id: "cone", label: "Cone", desc: "Hình nón xoắn", icon: "🍦" },
   { id: "grid", label: "Grid Wall", desc: "Tường phẳng", icon: "🧱" },
   { id: "spiral", label: "Spiral", desc: "Xoắn ốc vô cực", icon: "🌀" },
@@ -18,7 +23,9 @@ const UIOverlay = ({
   min = 20,
   max = 1000,
   step = 10,
+  isLoadingNextBatch,
 }) => {
+  // Danh sách có đang dropdown không?
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Tìm thông tin layout hiện tại để hiển thị
@@ -150,7 +157,7 @@ const UIOverlay = ({
               <button
                 onClick={() => handleAdjustCount(step)}
                 disabled={imageCount === max}
-                className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 transition-all hover:bg-white/20 hover:text-green-400 active:scale-95 disabled:opacity-30"
+                className={`flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 transition-all hover:bg-white/20 hover:text-green-400 active:scale-95 disabled:opacity-30 ${isLoadingNextBatch ? "cursor-wait opacity-50" : ""}`}
               >
                 <svg
                   width="12"

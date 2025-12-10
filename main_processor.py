@@ -19,7 +19,7 @@ Image.MAX_IMAGE_PIXELS = None
 # --- Cấu hình chung ---
 INPUT_FOLDER = "public/test" # Folder input
 THUMB_FOLDER = "public/thumbnail" # Folder output
-THUMB_SIZE = 800 # Kích thước cạnh lớn nhất
+THUMB_SIZE = 256 # Kích thước cạnh lớn nhất
 THUMB_QUALITY = 80 # Giữ lại chất lượng 80%
 
 # Hàm tạo thumbnail

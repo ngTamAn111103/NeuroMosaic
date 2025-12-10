@@ -4,12 +4,16 @@ import * as THREE from "three";
 // React
 import { useState } from "react";
 
-function ImageItem({ data }) {
+function ImageItem({ data, textureCache }) {
   // Ảnh này có đang được hover không?
   const [hovered, setHovered] = useState(false);
 
   // Nạp ảnh
-  const texture = useLoader(THREE.TextureLoader, data.thumb_path);
+  // const texture = useLoader(THREE.TextureLoader, data.thumb_path);
+  const cached = textureCache?.[data.thumb_path];
+
+  const texture = cached || useLoader(THREE.TextureLoader, data.thumb_path);
+
   // Lấy vị trí
   const [x, y, z] = data.position;
 

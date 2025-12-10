@@ -3,7 +3,7 @@ import { OrbitControls, Stars } from "@react-three/drei";
 import { Canvas, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 // React
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 // Data ảnh
 import data_images from "../final_structure.json";
 // Cấu hình cho từng mode
@@ -13,6 +13,9 @@ import layoutConfig from "../layoutConfig.json";
 import ImageItem from "./components/ImageItem";
 import UIOverlay from "./components/UIOverlay";
 
+// Step tăng giảm số lượng
+const STEP_IMAGE = 5;
+
 function App() {
   // State lưu mode hiện tại
   const [currentMode, setCurrentMode] = useState("grid");
@@ -20,6 +23,46 @@ function App() {
 
   // State lưu số lượng ảnh hiện tại
   const [imageCount, setImageCount] = useState(20);
+  // Giới hạn số lượng ảnh hiển thị
+  const visibleImages = data_images.slice(0, imageCount);
+  // Có đang load ảnh của step tiếp theo không
+  const [isLoadingNextBatch, setIsLoadingNextBatch] = useState(false);
+  // Lưu cache + neo cho ImageItem để không phải chớp tắt
+  const textureCache = useRef({});
+
+  // Load trước số ảnh step cho bước tiếp theo
+  useEffect(() => {
+    const preloadNextBatch = async () => {
+      setIsLoadingNextBatch(true);
+      const next = data_images.slice(imageCount, imageCount + STEP_IMAGE);
+      const loader = new THREE.TextureLoader();
+
+      await Promise.all(
+        next.map(
+          (img) =>
+            new Promise((resolve) => {
+              // Nếu đã cache rồi thì bỏ qua
+              if (textureCache.current[img.thumb_path]) return resolve();
+
+              const loader = new THREE.TextureLoader();
+              loader.load(
+                img.thumb_path,
+                (tex) => {
+                  textureCache.current[img.thumb_path] = tex;
+                  resolve();
+                },
+                undefined,
+                resolve,
+              );
+            }),
+        ),
+      );
+
+      setIsLoadingNextBatch(false);
+    };
+
+    preloadNextBatch();
+  }, [imageCount]);
 
   return (
     <>
@@ -32,6 +75,8 @@ function App() {
           setImageCount={setImageCount}
           min={20}
           max={Math.min(200, data_images.length)}
+          step={STEP_IMAGE}
+          isLoadingNextBatch={isLoadingNextBatch}
         />
         {/* Toàn bộ không gian 3D */}
 
@@ -49,8 +94,12 @@ function App() {
             fade
             speed={0.5}
           />
-          {data_images.slice(0, imageCount).map((img) => (
-            <ImageItem key={img.id} data={img} />
+          {visibleImages.map((img) => (
+            <ImageItem
+              key={img.id}
+              data={img}
+              textureCache={textureCache.current}
+            />
           ))}
 
           <OrbitControls
@@ -68,4 +117,4 @@ function App() {
 export default App;
 // TODO: tương tác click vào ảnh
 // TODO: Đổi mode
-// TODO:
+// TODO: Xử lý ảnh chớp tắt
