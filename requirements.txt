@@ -1,0 +1,9 @@
+Pillow
+torch
+transformers
+umap-learn
+pillow-heif
+tqdm
+torchvision
+numpy
+scikit-learn
