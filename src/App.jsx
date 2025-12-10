@@ -22,7 +22,7 @@ function App() {
       <div className="h-screen w-full bg-gray-900">
         {/* Toàn bộ không gian 3D */}
 
-        <Canvas camera={{ position: config.cameraPosition }}>
+        <Canvas camera={{ position: config.cameraPosition, fov:config.cameraFov }} >
           {/* Ánh sáng */}
           <ambientLight intensity={1} />
 
@@ -33,6 +33,7 @@ function App() {
           <OrbitControls
             enableZoom={config.OrbitControlsZoom}
             enablePan={config.OrbitControlsPan}
+            panSpeed={config.OrbitControlSpanSpeed}
             enableRotate={config.OrbitControlsRotate}
 
           />
