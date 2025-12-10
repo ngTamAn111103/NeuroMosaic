@@ -98,6 +98,9 @@ class FeatureExtractor:
         # Model: Mạng nơ-ron thực hiện tính toán
         self.model = AutoModel.from_pretrained(model_name).to(self.device)
 
+        # Chuyển toàn bộ trọng số model sang FP16
+        self.model = self.model.half() 
+
         # Chuyển sang chế độ 'eval' (Evaluation)
         # Báo cho model biết ta đang dùng để dự đoán, không phải để train.
         # Giúp khóa các tham số lại, chạy nhanh hơn và ổn định hơn.
@@ -158,7 +161,9 @@ class FeatureExtractor:
             do_center_crop=False
         )
         
-        inputs = {k: v.to(self.device) for k, v in inputs.items()}
+        # inputs = {k: v.to(self.device) for k, v in inputs.items()}
+        # Thử với FP16
+        inputs = {k: v.to(self.device).half() for k, v in inputs.items()}
 
         # 3. Inference
         with torch.no_grad():
@@ -170,7 +175,8 @@ class FeatureExtractor:
         embedding = last_hidden_states[:, 0, :] # Lấy CLS Token
         
         # 5. Trả về kết quả (Xử lý chiều dữ liệu)
-        result = embedding.cpu().numpy()
+        # .float() để chuyển từ FP16 về lại FP32 trước khi sang CPU/Numpy
+        result = embedding.float().cpu().numpy()
         
         if is_batch:
             return result # Trả về mảng 2 chiều (N, 1024)
@@ -386,7 +392,7 @@ def generate_layout(input_file="data_vectors.json", output_file="final_structure
     # A. Scale về không gian hiển thị (Ví dụ từ -35 đến 35)
     # Đây là kích thước sân khấu của bạn trên Web
     # OPTION
-    SCENE_SIZE = 35 
+    SCENE_SIZE = 20 
     scaler = MinMaxScaler(feature_range=(-SCENE_SIZE, SCENE_SIZE))
     embedding_3d = scaler.fit_transform(embedding_3d)
     
@@ -433,7 +439,7 @@ if __name__ == "__main__":
     start_time = time.time()
     # --- BƯỚC 1: TẠO THUMBNAIL ---
     # (Nếu chạy rồi thì comment lại cho nhanh)
-    create_thumbnails(INPUT_FOLDER, THUMB_FOLDER)
+    # create_thumbnails(INPUT_FOLDER, THUMB_FOLDER)
     
     
     # --- BƯỚC 2: TRÍCH XUẤT ĐẶC TRƯNG (PIPELINE) ---
@@ -451,13 +457,13 @@ if __name__ == "__main__":
 
     # --- BƯỚC 3: TẠO TOẠ ĐỘ 3D (MAPPING) ---
     # File cuối cùng cho Web
-    FINAL_FILE = "final_structure.json"
+    # FINAL_FILE = "final_structure.json"
     
-    # Bước này chạy rất nhanh (vài giây), nên cứ chạy lại thoải mái
-    if os.path.exists(VECTOR_FILE):
-        generate_layout(input_file=VECTOR_FILE, output_file=FINAL_FILE)
-    else:
-        print("❌ Không có dữ liệu vector để vẽ bản đồ.")
+    # # Bước này chạy rất nhanh (vài giây), nên cứ chạy lại thoải mái
+    # if os.path.exists(VECTOR_FILE):
+    #     generate_layout(input_file=VECTOR_FILE, output_file=FINAL_FILE)
+    # else:
+    #     print("❌ Không có dữ liệu vector để vẽ bản đồ.")
 
     
 
@@ -474,4 +480,4 @@ if __name__ == "__main__":
 # TODO: outputs.last_hidden_state[:, 0, :] hiện tại đang lấy CLS TOKEN
 # Nó là token được model đào tạo để tóm tắt ảnh
 
-# 
+# TODO: một "cơ chế bảo hiểm" vào mã nguồn: Lưu tự động (Auto-save) sau mỗi 50 ảnh. -> Chạy số lượng lớn

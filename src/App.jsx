@@ -30,6 +30,9 @@ function App() {
   // Bộ nhớ cache cho ảnh
   const textureCache = useRef({});
 
+  // Lưu ảnh nào đang được click
+  const [selectedImage, setSelectedImage] = useState(null);
+
   // Load trước số ảnh step cho bước tiếp theo
   useEffect(() => {
     const preloadNextBatch = async () => {
@@ -105,6 +108,7 @@ function App() {
               key={img.id}
               data={img}
               textureCache={textureCache.current}
+              setSelectedImage={setSelectedImage}
             />
           ))}
 
@@ -115,6 +119,19 @@ function App() {
             enableRotate={config.OrbitControlsRotate}
           />
         </Canvas>
+        {selectedImage && (
+            <div
+              className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+              onClick={() => setSelectedImage(null)} // click nền để tắt
+            >
+              <img
+                src={selectedImage.highress_path || selectedImage.thumb_path}
+                alt={selectedImage.highress_path}
+                className="max-h-[90vh] max-w-[90vw] rounded-lg shadow-2xl"
+                onClick={(e) => e.stopPropagation()} // chặn click xuyên qua ảnh
+              />
+            </div>
+          )}
       </div>
     </>
   );

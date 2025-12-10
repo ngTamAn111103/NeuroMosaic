@@ -4,7 +4,7 @@ import * as THREE from "three";
 // React
 import { useState } from "react";
 
-function ImageItem({ data, textureCache }) {
+function ImageItem({ data, textureCache, setSelectedImage }) {
   // Ảnh này có đang được hover không?
   const [hovered, setHovered] = useState(false);
 
@@ -24,6 +24,11 @@ function ImageItem({ data, textureCache }) {
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
       scale={hovered ? 3 : 1}
+      onPointerDown={(e) => {
+        e.stopPropagation(); // tránh click xuyên ra nền
+        setSelectedImage(data);
+        console.log("Click ảnh:", data.id);
+      }}
     >
       {/* Kích thước mặt phẳng */}
       <planeGeometry args={[1, 1]} />

@@ -1,0 +1,18 @@
+{
+  "grid": {
+    "cameraPosition": [0, 0, 55],
+    "cameraFov": 60,
+    "OrbitControlsZoom": true,
+    "OrbitControlsPan": true ,
+    "OrbitControlSpanSpeed": 0.2 ,
+    "OrbitControlsRotate": false 
+  },
+  "modeB": {
+    "cameraPosition": [0, 10, 100],
+    "cameraFov": 60,
+    "OrbitControlsZoom": false,
+    "OrbitControlsPan": true,
+    "OrbitControlSpanSpeed": 2,
+    "OrbitControlsRotate": false
+  }
+}
