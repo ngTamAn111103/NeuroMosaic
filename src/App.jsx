@@ -7,40 +7,35 @@ import { useState } from "react";
 // Data ảnh
 import data_images from "../final_structure.json";
 // Cấu hình cho từng mode
-import config from "../layoutConfig.json";
+import layoutConfig from "../layoutConfig.json";
 
-function ImageMesh({ data }) {
-  const texture = useLoader(THREE.TextureLoader, data.thumb_path);
-  const [x, y, z] = data.position;
-
-  return (
-    // Một mặt phẳng hiển thị ảnh
-    <mesh position={[x, y, z]}>
-      {/* Kích thước mặt phẳng */}
-      <planeGeometry args={[1, 1]} />
-      {/* Dán texture (ảnh) lên mặt phẳng */}
-      <meshBasicMaterial map={texture} />
-    </mesh>
-  );
-}
+// Component
+import ImageItem from "./components/ImageItem";
 
 function App() {
-  // Nạp ảnh
+  // 🔹 State lưu mode hiện tại
+  const [currentMode, setCurrentMode] = useState("grid");
+  const config = layoutConfig[currentMode];
 
   return (
     <>
       <div className="h-screen w-full bg-gray-900">
         {/* Toàn bộ không gian 3D */}
 
-        <Canvas camera={{ position: [0, 0, 50] }}>
+        <Canvas camera={{ position: config.cameraPosition }}>
           {/* Ánh sáng */}
           <ambientLight intensity={1} />
 
           {data_images.map((img) => (
-            <ImageMesh key={img.id} data={img} />
+            <ImageItem key={img.id} data={img} />
           ))}
 
-          <OrbitControls enableZoom={true} />
+          <OrbitControls
+            enableZoom={config.OrbitControlsZoom}
+            enablePan={config.OrbitControlsPan}
+            enableRotate={config.OrbitControlsRotate}
+
+          />
         </Canvas>
       </div>
     </>
@@ -48,5 +43,4 @@ function App() {
 }
 
 export default App;
-// TODO: Load các config từ file .json
 // TODO: tương tác click vào ảnh
