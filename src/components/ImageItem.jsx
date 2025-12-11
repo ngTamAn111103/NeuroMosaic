@@ -5,7 +5,6 @@ import * as THREE from "three";
 import { useState } from "react";
 
 function ImageItem({ data, textureCache, setSelectedImage, config }) {
-
   // Kiểm tra và lấy ra data.thumb_path từ textureCache truyền vào
   const cached = textureCache?.[data.thumb_path];
   // Nếu cached có -> Sử dụng cached
@@ -20,6 +19,8 @@ function ImageItem({ data, textureCache, setSelectedImage, config }) {
     <mesh
       position={[x, y, z]}
       onPointerDown={(e) => {
+        // Chỉ click chuột trái mới hiển thị ảnh
+        if (e.button !== 0) return;
         e.stopPropagation(); // tránh click xuyên ra nền
         setSelectedImage(data);
         console.log("Click ảnh:", data.id);
@@ -35,4 +36,4 @@ function ImageItem({ data, textureCache, setSelectedImage, config }) {
 
 export default ImageItem;
 
-// TODO: Cần bỏ tính năng hover đi 
+// TODO: Cần bỏ tính năng hover đi
