@@ -1,6 +1,7 @@
 {
   "grid": {
-    "cameraPosition": [0, 0, 55],
+    "cameraPosition": [0, 0, 60],
+    "planeGeometry_args": [2,2,1],
     "cameraFov": 60,
     "OrbitControlsZoom": true,
     "OrbitControlsPan": true ,
@@ -9,6 +10,7 @@
   },
   "modeB": {
     "cameraPosition": [0, 10, 100],
+    "planeGeometry_args": [1,1,1],
     "cameraFov": 60,
     "OrbitControlsZoom": false,
     "OrbitControlsPan": true,

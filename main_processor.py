@@ -491,7 +491,6 @@ if __name__ == "__main__":
 # TODO: outputs.last_hidden_state[:, 0, :] hiện tại đang lấy CLS TOKEN
 # Nó là token được model đào tạo để tóm tắt ảnh
 
-# TODO: một "cơ chế bảo hiểm" vào mã nguồn: Lưu tự động (Auto-save) sau mỗi 50 ảnh. -> Chạy số lượng lớn
 # Nên coi lại chuẩn hoá khi SCENE_SIZE = 30 thì xy=SCENE_SIZE thooi, còn Z phải tính toán lại cho phù hoppwj
 # bổ xung vào json hasing, nếu đã có bỏ qua
 # thêm tính năng lọc giống bằng hasing, lọc trùng, và backup + kiểm tra đã có rồi thì bỏ qua

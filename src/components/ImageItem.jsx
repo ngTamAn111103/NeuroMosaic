@@ -4,7 +4,7 @@ import * as THREE from "three";
 // React
 import { useState } from "react";
 
-function ImageItem({ data, textureCache, setSelectedImage }) {
+function ImageItem({ data, textureCache, setSelectedImage, config }) {
   // Ảnh này có đang được hover không?
   const [hovered, setHovered] = useState(false);
 
@@ -31,7 +31,7 @@ function ImageItem({ data, textureCache, setSelectedImage }) {
       }}
     >
       {/* Kích thước mặt phẳng */}
-      <planeGeometry args={[1, 1]} />
+      <planeGeometry args={config.planeGeometry_args} />
       {/* Dán texture (ảnh) lên mặt phẳng */}
       <meshBasicMaterial map={texture} />
     </mesh>
@@ -39,3 +39,5 @@ function ImageItem({ data, textureCache, setSelectedImage }) {
 }
 
 export default ImageItem;
+
+// TODO: Cần bỏ tính năng hover đi 

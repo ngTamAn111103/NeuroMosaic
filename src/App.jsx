@@ -109,6 +109,7 @@ function App() {
               data={img}
               textureCache={textureCache.current}
               setSelectedImage={setSelectedImage}
+              config={config}
             />
           ))}
 
