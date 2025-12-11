@@ -15,7 +15,7 @@ import UIOverlay from "./components/UIOverlay";
 import AnimatedCamera from "./components/AnimatedCamera";
 
 // Step tăng giảm số lượng
-const STEP_IMAGE = 5;
+const STEP_IMAGE = 20;
 
 function App() {
   // State lưu mode hiện tại
