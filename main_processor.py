@@ -11,6 +11,7 @@ from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import MinMaxScaler
 import umap
+import hashlib
 
 # Gỡ bỏ giới hạn pixel cho ảnh độ phân giải lớn
 Image.MAX_IMAGE_PIXELS = None  
@@ -22,6 +23,25 @@ THUMB_FOLDER = "public/thumbnail" # Folder output
 THUMB_SIZE = 512 # Kích thước cạnh lớn nhất
 THUMB_QUALITY = 80 # Giữ lại chất lượng 80%
 
+# Hàm kiểm tra trùng lặp bằng sha256
+def check_dup_by_sha256(database, image_path):
+    # Tính sha256 của ảnh
+    hasher = hashlib.sha256()
+    with open(image_path, 'rb') as f:
+        # Đọc file theo chunk để tiết kiệm RAM với file lớn
+        for chunk in iter(lambda: f.read(65536), b""):
+            hasher.update(chunk)
+    
+    # LẤY CHUỖI HEX
+    current_digest = hasher.hexdigest()
+
+    # Tìm trùng lặp
+    # database lúc này nên chứa các chuỗi string, không phải object
+    for data_image in database:
+        if current_digest in data_image['sha256']:
+            return (True, current_digest)
+        
+    return (False, current_digest)
 # Hàm tạo thumbnail
 def create_thumbnails(input_dir, output_dir):
     """
@@ -39,8 +59,9 @@ def create_thumbnails(input_dir, output_dir):
     # Danh sách file ảnh gốc hợp lệ
     valid_exts = ('.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tiff')
     files = [f for f in os.listdir(input_dir) if f.lower().endswith(valid_exts)]
-    
+    files.sort()
     count = 0
+    database = []
     for filename in tqdm(files, desc="🔨 Creating Thumbnails", unit="img"):
         # Đường dẫn tuyệt đối của file ảnh
         src_path = os.path.join(input_dir, filename)
@@ -49,9 +70,18 @@ def create_thumbnails(input_dir, output_dir):
         # Đường dẫn tuyệt đối mới = đường dẫn output + filename.webp
         dst_path = os.path.join(output_dir, dst_name)
 
+
+        dup_flag, sha256_digest = check_dup_by_sha256(database, src_path)
+        # Đã trùng: Khỏi làm gì tiếp
+        if dup_flag: continue
+
+        # Nếu không trùng: Cập nhật data base
+        database.append({
+            "sha256":sha256_digest
+        })
         # Nếu ảnh thumbnail đã có rồi thì bỏ qua luôn, không mở ảnh gốc ra nữa
-        if os.path.exists(dst_path):
-            continue
+        # if os.path.exists(dst_path):
+        #     continue
 
         try:
             # Mở ảnh gốc
@@ -263,7 +293,10 @@ def run_processing_pipeline(input_folder, output_json="data_vectors.json"):
     slicer = ImageSlicer(window_size=518, overlap_ratio=0.2)
     
     database = []
-    
+    # Nếu có file vector -> Đọc để ghi tiếp thay vì xoá hay dừng
+    if os.path.exists(VECTOR_FILE):
+        with open(VECTOR_FILE, 'r') as f:
+            database = json.load(f)
     # Lấy danh sách ảnh
     valid_exts = ('.jpg', '.jpeg', '.png', '.webp')
     files = [f for f in os.listdir(input_folder) if f.lower().endswith(valid_exts)]
@@ -272,11 +305,18 @@ def run_processing_pipeline(input_folder, output_json="data_vectors.json"):
     files.sort()
     
     print(f"📂 Tìm thấy {len(files)} ảnh trong {input_folder}")
-    
+    SAVE_INTERVAL = 2 # Cứ xong 5 ảnh thì lưu file 1 lần (Tránh mất điện/disconnect)
+    count_since_save = 0
     # Vòng lặp chính (Có thanh tiến trình)
     for filename in tqdm(files, desc="🧠 Extracting Features", unit="img"):
         try:
             img_path = os.path.join(input_folder, filename)
+            dup_flag, sha256_digest = check_dup_by_sha256(database, img_path)
+            
+            # Đã trùng: Bỏ qua
+            if dup_flag:
+                # print(f"run_processing_pipeline | Trùng sha256 ảnh {img_path}")
+                continue
             
             # Mở ảnh
             with Image.open(img_path) as img:
@@ -296,9 +336,6 @@ def run_processing_pipeline(input_folder, output_json="data_vectors.json"):
                 local_vectors_list = []
                 # OPTION: Gom [BATCH_SIZE] ảnh con rồi quăng vào hàm extract
                 BATCH_SIZE = 8 # Tùy VRAM, 8 là an toàn
-
-                SAVE_INTERVAL = 5 # Cứ xong 50 ảnh thì lưu file 1 lần (Tránh mất điện/disconnect)
-                count_since_save = 0
 
                 for tile in tile_gen:
                     batch_imgs.append(tile)
@@ -342,7 +379,8 @@ def run_processing_pipeline(input_folder, output_json="data_vectors.json"):
                     "id": filename,
                     "highress_path": img_path,
                     "thumb_path": thumb_path,
-                    "vector": final_vector.tolist() # Chuyển numpy -> list để lưu JSON
+                    "vector": final_vector.tolist(), # Chuyển numpy -> list để lưu JSON
+                    "sha256": sha256_digest # Lưu sha256 để kiểm tra trùng lặp
                 })
                 # --- E. CƠ CHẾ AUTO-SAVE ---
                 count_since_save += 1
@@ -351,7 +389,7 @@ def run_processing_pipeline(input_folder, output_json="data_vectors.json"):
                     with open(output_json, 'w') as f:
                         json.dump(database, f)
                     count_since_save = 0
-                    # print(f"   (Đã lưu checkpoint: {len(database)} ảnh)") # Bỏ comment nếu muốn xem log
+                    # print(f"   (Đã lưu checkpoint: {len(database)} ảnh)")
                 
         except Exception as e:
             tqdm.write(f"❌ Lỗi xử lý {filename}: {e}")
@@ -450,21 +488,18 @@ if __name__ == "__main__":
     start_time = time.time()
     # --- BƯỚC 1: TẠO THUMBNAIL ---
     # (Nếu chạy rồi thì comment lại cho nhanh)
-    # create_thumbnails(INPUT_FOLDER, THUMB_FOLDER)
+    create_thumbnails(INPUT_FOLDER, THUMB_FOLDER)
     
     
     # --- BƯỚC 2: TRÍCH XUẤT ĐẶC TRƯNG (PIPELINE) ---
     # File trung gian chứa vector 1024 chiều
     VECTOR_FILE = "data_vectors.json" 
     
-    # Kiểm tra xem có cần chạy lại bước nặng nhất này không
-    if not os.path.exists(VECTOR_FILE):
-        if os.path.exists(INPUT_FOLDER):
-            run_processing_pipeline(INPUT_FOLDER, output_json=VECTOR_FILE)
-        else:
-            print(f"⚠️ Không tìm thấy thư mục ảnh: {INPUT_FOLDER}")
+    if os.path.exists(INPUT_FOLDER):
+        run_processing_pipeline(INPUT_FOLDER, output_json=VECTOR_FILE)
     else:
-        print(f"ℹ️ Đã tìm thấy {VECTOR_FILE}. Bỏ qua bước trích xuất.")
+        print(f"⚠️ Không tìm thấy thư mục ảnh: {INPUT_FOLDER}")
+    
 
     # --- BƯỚC 3: TẠO TOẠ ĐỘ 3D (MAPPING) ---
     # File cuối cùng cho Web
