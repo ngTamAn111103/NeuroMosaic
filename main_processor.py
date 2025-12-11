@@ -296,7 +296,10 @@ def run_processing_pipeline(input_folder, output_json="data_vectors.json"):
                 local_vectors_list = []
                 # OPTION: Gom [BATCH_SIZE] ảnh con rồi quăng vào hàm extract
                 BATCH_SIZE = 8 # Tùy VRAM, 8 là an toàn
-                
+
+                SAVE_INTERVAL = 10 # Cứ xong 50 ảnh thì lưu file 1 lần (Tránh mất điện/disconnect)
+                count_since_save = 0
+
                 for tile in tile_gen:
                     batch_imgs.append(tile)
                     
@@ -341,6 +344,14 @@ def run_processing_pipeline(input_folder, output_json="data_vectors.json"):
                     "thumb_path": thumb_path,
                     "vector": final_vector.tolist() # Chuyển numpy -> list để lưu JSON
                 })
+                # --- E. CƠ CHẾ AUTO-SAVE ---
+                count_since_save += 1
+                if count_since_save >= SAVE_INTERVAL:
+                    # Lưu file tạm thời
+                    with open(output_json, 'w') as f:
+                        json.dump(database, f)
+                    count_since_save = 0
+                    # print(f"   (Đã lưu checkpoint: {len(database)} ảnh)") # Bỏ comment nếu muốn xem log
                 
         except Exception as e:
             tqdm.write(f"❌ Lỗi xử lý {filename}: {e}")
@@ -481,3 +492,6 @@ if __name__ == "__main__":
 # Nó là token được model đào tạo để tóm tắt ảnh
 
 # TODO: một "cơ chế bảo hiểm" vào mã nguồn: Lưu tự động (Auto-save) sau mỗi 50 ảnh. -> Chạy số lượng lớn
+# Nên coi lại chuẩn hoá khi SCENE_SIZE = 30 thì xy=SCENE_SIZE thooi, còn Z phải tính toán lại cho phù hoppwj
+# bổ xung vào json hasing, nếu đã có bỏ qua
+# thêm tính năng lọc giống bằng hasing, lọc trùng, và backup + kiểm tra đã có rồi thì bỏ qua
