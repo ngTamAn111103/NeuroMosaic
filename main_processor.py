@@ -297,7 +297,7 @@ def run_processing_pipeline(input_folder, output_json="data_vectors.json"):
                 # OPTION: Gom [BATCH_SIZE] ảnh con rồi quăng vào hàm extract
                 BATCH_SIZE = 8 # Tùy VRAM, 8 là an toàn
 
-                SAVE_INTERVAL = 10 # Cứ xong 50 ảnh thì lưu file 1 lần (Tránh mất điện/disconnect)
+                SAVE_INTERVAL = 5 # Cứ xong 50 ảnh thì lưu file 1 lần (Tránh mất điện/disconnect)
                 count_since_save = 0
 
                 for tile in tile_gen:

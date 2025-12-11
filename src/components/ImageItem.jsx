@@ -5,8 +5,6 @@ import * as THREE from "three";
 import { useState } from "react";
 
 function ImageItem({ data, textureCache, setSelectedImage, config }) {
-  // Ảnh này có đang được hover không?
-  const [hovered, setHovered] = useState(false);
 
   // Kiểm tra và lấy ra data.thumb_path từ textureCache truyền vào
   const cached = textureCache?.[data.thumb_path];
@@ -21,9 +19,6 @@ function ImageItem({ data, textureCache, setSelectedImage, config }) {
     // Một mặt phẳng hiển thị ảnh
     <mesh
       position={[x, y, z]}
-      onPointerOver={() => setHovered(true)}
-      onPointerOut={() => setHovered(false)}
-      scale={hovered ? 3 : 1}
       onPointerDown={(e) => {
         e.stopPropagation(); // tránh click xuyên ra nền
         setSelectedImage(data);

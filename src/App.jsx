@@ -142,3 +142,5 @@ export default App;
 // TODO: tương tác click vào ảnh
 // TODO: Đổi mode
 // TODO: Xử lý ảnh chớp tắt
+// TODO: Ở layout bên trong quả cầu, đừng xây dựng hình tròn bán kính R, mà hãy làm cong ở góc FOV thôi
+// TODO: Tách layout Sphere ra 2 mode, quả cầu nhìn từ ngoài và và hình cong FOV
