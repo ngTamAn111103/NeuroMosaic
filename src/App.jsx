@@ -124,10 +124,15 @@ function App() {
           ))}
 
           <OrbitControls
-            enableZoom={isIntroDone?config.OrbitControlsZoom: false}
-            enablePan={isIntroDone?config.OrbitControlsPan:false}
+            enableZoom={isIntroDone ? config.OrbitControlsZoom : false}
+            enablePan={isIntroDone ? config.OrbitControlsPan : false}
+            enableRotate={isIntroDone ? config.OrbitControlsRotate : false}
             panSpeed={config.OrbitControlSpanSpeed}
-            enableRotate={isIntroDone?config.OrbitControlsRotate:false}
+            rotateSpeed={config.OrbitControlsRotateSpeed}
+            mouseButtons={{
+              LEFT: THREE.MOUSE.PAN, // 🖱️ Chuột trái dùng để PAN
+              RIGHT: THREE.MOUSE.ROTATE, // 🖱️ Chuột phải dùng để ROTATE
+            }}
           />
         </Canvas>
         {selectedImage && (

@@ -5,16 +5,18 @@
     "cameraFov": 60,
     "OrbitControlsZoom": true,
     "OrbitControlsPan": true ,
-    "OrbitControlSpanSpeed": 0.2 ,
-    "OrbitControlsRotate": false 
+    "OrbitControlSpanSpeed": 0.3 ,
+    "OrbitControlsRotate": true,
+    "OrbitControlsRotateSpeed": 0.3
   },
-  "modeB": {
+  "sphere": {
     "cameraPosition": [0, 10, 100],
     "planeGeometry_args": [1,1,1],
     "cameraFov": 60,
     "OrbitControlsZoom": false,
     "OrbitControlsPan": true,
     "OrbitControlSpanSpeed": 2,
-    "OrbitControlsRotate": false
+    "OrbitControlsRotate": false,
+    "OrbitControlsRotateSpeed": 2
   }
 }

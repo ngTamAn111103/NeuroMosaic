@@ -503,13 +503,13 @@ if __name__ == "__main__":
 
     # --- BƯỚC 3: TẠO TOẠ ĐỘ 3D (MAPPING) ---
     # File cuối cùng cho Web
-    # FINAL_FILE = "final_structure.json"
+    FINAL_FILE = "final_structure.json"
     
-    # # Bước này chạy rất nhanh (vài giây), nên cứ chạy lại thoải mái
-    # if os.path.exists(VECTOR_FILE):
-    #     generate_layout(input_file=VECTOR_FILE, output_file=FINAL_FILE)
-    # else:
-    #     print("❌ Không có dữ liệu vector để vẽ bản đồ.")
+    # Bước này chạy rất nhanh (vài giây), nên cứ chạy lại thoải mái
+    if os.path.exists(VECTOR_FILE):
+        generate_layout(input_file=VECTOR_FILE, output_file=FINAL_FILE)
+    else:
+        print("❌ Không có dữ liệu vector để vẽ bản đồ.")
 
     
 
@@ -526,6 +526,9 @@ if __name__ == "__main__":
 # TODO: outputs.last_hidden_state[:, 0, :] hiện tại đang lấy CLS TOKEN
 # Nó là token được model đào tạo để tóm tắt ảnh
 
-# Nên coi lại chuẩn hoá khi SCENE_SIZE = 30 thì xy=SCENE_SIZE thooi, còn Z phải tính toán lại cho phù hoppwj
-# bổ xung vào json hasing, nếu đã có bỏ qua
-# thêm tính năng lọc giống bằng hasing, lọc trùng, và backup + kiểm tra đã có rồi thì bỏ qua
+# Nên coi lại chuẩn hoá khi SCENE_SIZE = 30 thì xy=SCENE_SIZE thooi, còn Z phải tính toán lại cho phù hợp
+# TODO: Khi người dùng xoá ảnh khỏi INPUT_FOLDER, phải tính để xoá phần tử trong VECTOR_FILE
+
+# TODO: Viết nhanh 1 check.py để kiểm tra trong json có đúng file==sha256 + file còn tồn tại không
+# TODO: Viết nhanh 1 update.py để bỏ sha-256 vào dataset Kaggle
+

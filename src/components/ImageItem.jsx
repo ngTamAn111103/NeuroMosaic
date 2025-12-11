@@ -33,33 +33,41 @@ function ImageItem({ data, textureCache, setSelectedImage, config }) {
   useFrame((state, delta) => {
     if (!meshRef.current || !materialRef.current) return;
 
-    // damp(a, b, λ, dt): Làm mượt giá trị từ a → b, càng gần càng chậm (giống easing-out).
-    meshRef.current.position.x = THREE.MathUtils.damp(
-      meshRef.current.position.x,
-      target.x,
-      2, // tốc độ
-      delta,
-    );
-    meshRef.current.position.y = THREE.MathUtils.damp(
-      meshRef.current.position.y,
-      target.y,
-      2,
-      delta,
-    );
-    meshRef.current.position.z = THREE.MathUtils.damp(
-      meshRef.current.position.z,
-      target.z,
-      2,
-      delta,
-    );
-
-    // Fade in opacity
-    materialRef.current.opacity = THREE.MathUtils.damp(
-      materialRef.current.opacity,
-      1,
-      1,
-      delta,
-    );
+    // Khi reload trang, các ảnh sẽ bay từ tâm ra position + opacity 0 -> 1
+    {
+      // damp(a, b, λ, dt): Làm mượt giá trị từ a → b, càng gần càng chậm (giống easing-out).
+      meshRef.current.position.x = THREE.MathUtils.damp(
+        meshRef.current.position.x,
+        target.x,
+        2, // tốc độ
+        delta,
+      );
+      meshRef.current.position.y = THREE.MathUtils.damp(
+        meshRef.current.position.y,
+        target.y,
+        2,
+        delta,
+      );
+      meshRef.current.position.z = THREE.MathUtils.damp(
+        meshRef.current.position.z,
+        target.z,
+        2,
+        delta,
+      );
+      // Fade in opacity
+      materialRef.current.opacity = THREE.MathUtils.damp(
+        materialRef.current.opacity,
+        1,
+        1,
+        delta,
+      );
+    }
+  });
+  useFrame(({ camera }) => {
+    if (meshRef.current) {
+      // Hiệu ứng billboarding (mặt phẳng của ảnh luôn quay về phía camera)
+      meshRef.current.lookAt(camera.position);
+    }
   });
 
   return (
@@ -84,4 +92,4 @@ function ImageItem({ data, textureCache, setSelectedImage, config }) {
 
 export default ImageItem;
 
-// TODO: Cần bỏ tính năng hover đi
+// TODO: Cần xây dựng thêm tính năng khi giảm ảnh thì đi về 000 rồi mới mất

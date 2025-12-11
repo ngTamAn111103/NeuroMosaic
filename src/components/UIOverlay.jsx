@@ -124,6 +124,26 @@ const UIOverlay = ({
               </div>
             </div>
           </div>
+          {/* Ghi chú */}
+          {/* 🔹 Ghi chú hướng dẫn thao tác */}
+          <div className="mt-3 rounded-lg border border-white/10 bg-white/5 p-2 text-[10px] text-gray-400">
+            {currentLayout === "grid" && (
+              <p className="text-cyan-400">
+                🧱 Chuột trái để di chuyển <br/>🧱 Chuột phải để xoay <br/>🧱 Cuộn để zoom
+              </p>
+            )}
+            {currentLayout === "sphere" && (
+              <p>🌍 Chuột trái để xoay quanh – Chuột phải để di chuyển</p>
+            )}
+            {currentLayout === "spiral" && (
+              <p>
+                🌀 Chuột trái để xoay – Chuột phải để di chuyển – Cuộn để zoom
+              </p>
+            )}
+            {currentLayout === "random" && (
+              <p>🎲 Chuột trái để khám phá – Chuột phải để điều hướng</p>
+            )}
+          </div>
 
           {/* 3. Image Counter Control */}
           <div>
