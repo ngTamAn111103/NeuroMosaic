@@ -12,6 +12,7 @@ import layoutConfig from "../layoutConfig.json";
 // Component
 import ImageItem from "./components/ImageItem";
 import UIOverlay from "./components/UIOverlay";
+import AnimatedCamera from "./components/AnimatedCamera";
 
 // Step tăng giảm số lượng
 const STEP_IMAGE = 5;
@@ -19,6 +20,9 @@ const STEP_IMAGE = 5;
 function App() {
   // State lưu mode hiện tại
   const [currentMode, setCurrentMode] = useState("grid");
+  // Camera đã bay xong khi vừa mới reload trang chưa?
+  const [isIntroDone, setIsIntroDone] = useState(false);
+  // Lấy cấu hình
   const config = layoutConfig[currentMode];
 
   // State lưu số lượng ảnh hiện tại
@@ -92,6 +96,12 @@ function App() {
         <Canvas
           camera={{ position: config.cameraPosition, fov: config.cameraFov }}
         >
+          {/* Camera di chuyển từ xa đến lúc reload trang */}
+          <AnimatedCamera
+            targetPosition={config.cameraPosition}
+            isIntroDone={isIntroDone}
+            setIsIntroDone={setIsIntroDone}
+          />
           {/* Ánh sáng */}
           <ambientLight intensity={1} />
           <Stars
@@ -114,33 +124,31 @@ function App() {
           ))}
 
           <OrbitControls
-            enableZoom={config.OrbitControlsZoom}
-            enablePan={config.OrbitControlsPan}
+            enableZoom={isIntroDone?config.OrbitControlsZoom: false}
+            enablePan={isIntroDone?config.OrbitControlsPan:false}
             panSpeed={config.OrbitControlSpanSpeed}
-            enableRotate={config.OrbitControlsRotate}
+            enableRotate={isIntroDone?config.OrbitControlsRotate:false}
           />
         </Canvas>
         {selectedImage && (
-            <div
-              className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
-              onClick={() => setSelectedImage(null)} // click nền để tắt
-            >
-              <img
-                src={selectedImage.highress_path || selectedImage.thumb_path}
-                alt={selectedImage.highress_path}
-                className="max-h-[90vh] max-w-[90vw] rounded-lg shadow-2xl"
-                onClick={(e) => e.stopPropagation()} // chặn click xuyên qua ảnh
-              />
-            </div>
-          )}
+          <div
+            className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+            onClick={() => setSelectedImage(null)} // click nền để tắt
+          >
+            <img
+              src={selectedImage.highress_path || selectedImage.thumb_path}
+              alt={selectedImage.highress_path}
+              className="max-h-[90vh] max-w-[90vw] rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()} // chặn click xuyên qua ảnh
+            />
+          </div>
+        )}
       </div>
     </>
   );
 }
 
 export default App;
-// TODO: tương tác click vào ảnh
 // TODO: Đổi mode
-// TODO: Xử lý ảnh chớp tắt
 // TODO: Ở layout bên trong quả cầu, đừng xây dựng hình tròn bán kính R, mà hãy làm cong ở góc FOV thôi
 // TODO: Tách layout Sphere ra 2 mode, quả cầu nhìn từ ngoài và và hình cong FOV
