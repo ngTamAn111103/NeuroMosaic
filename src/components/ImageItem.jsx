@@ -23,10 +23,6 @@ function ImageItem({ data, textureCache, setSelectedImage, config }) {
     if (meshRef.current) {
       meshRef.current.position.set(0, 0, 0); // bắt đầu từ tâm
     }
-    if (materialRef.current) {
-      materialRef.current.opacity = 0; // ban đầu trong suốt
-      materialRef.current.transparent = true;
-    }
   }, []);
 
   // Chạy 60 lần/s
@@ -54,12 +50,27 @@ function ImageItem({ data, textureCache, setSelectedImage, config }) {
         2,
         delta,
       );
-      // Fade in opacity
-      materialRef.current.opacity = THREE.MathUtils.damp(
-        materialRef.current.opacity,
+      // 🌈 Giả lập hiệu ứng fade bằng màu sắc (thay vì opacity)
+      if (!materialRef.current.colorStart) {
+        // Khởi tạo chỉ 1 lần
+        materialRef.current.colorStart = new THREE.Color(0x101020); // Màu đen
+        materialRef.current.colorEnd = new THREE.Color(0xffffff); // Màu trắng đầy đủ
+        materialRef.current._fadeProgress = 0; // Tiến trình 0–1
+      }
+
+      // Tăng dần tiến trình
+      materialRef.current._fadeProgress = THREE.MathUtils.damp(
+        materialRef.current._fadeProgress,
         1,
-        1,
+        1.5, // tốc độ chuyển
         delta,
+      );
+
+      // Cập nhật màu hiện tại
+      materialRef.current.color.lerpColors(
+        materialRef.current.colorStart,
+        materialRef.current.colorEnd,
+        materialRef.current._fadeProgress,
       );
     }
   });

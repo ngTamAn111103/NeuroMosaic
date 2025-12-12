@@ -286,7 +286,7 @@ def run_processing_pipeline(input_folder, output_json="data_vectors.json"):
     # Global cần nhìn tổng thể -> input_size to (1024)
     # Local cần nhìn chi tiết -> input_size vừa (518) khớp với window
     # OPTION: Lựa chon small, base, large, giant
-    extractor = FeatureExtractor(model_name='facebook/dinov2-large')
+    extractor = FeatureExtractor(model_name='facebook/dinov2-base')
 
     # OPTION: chia ảnh thành các tiles có kích thước window_size, phải bội số của 14
     # overlap_ratio=0.2 là phù hợp
@@ -324,8 +324,8 @@ def run_processing_pipeline(input_folder, output_json="data_vectors.json"):
                 
                 # --- A. GLOBAL FEATURE ---
                 # Lấy vector toàn cảnh
-                # OPTION: Ảnh global: Máy mạnh nên chạy 1526
-                v_global = extractor.extract(img, input_size=1526)
+                # OPTION: Ảnh global: Máy mạnh nên chạy 1526, 2044 sấp sỉ ảnh 2k
+                v_global = extractor.extract(img, input_size=2044)
                 # Chuẩn hóa L2 ngay 
                 v_global = v_global / np.linalg.norm(v_global)
                 

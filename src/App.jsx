@@ -87,7 +87,8 @@ function App() {
           imageCount={imageCount}
           setImageCount={setImageCount}
           min={20}
-          max={Math.min(200, data_images.length)}
+          // max={Math.min(200, data_images.length)}
+          max={data_images.length}
           step={STEP_IMAGE}
           isLoadingNextBatch={isLoadingNextBatch}
         />
