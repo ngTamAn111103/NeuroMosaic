@@ -305,7 +305,7 @@ def run_processing_pipeline(input_folder, output_json="data_vectors.json"):
     files.sort()
     
     print(f"📂 Tìm thấy {len(files)} ảnh trong {input_folder}")
-    SAVE_INTERVAL = 2 # Cứ xong 5 ảnh thì lưu file 1 lần (Tránh mất điện/disconnect)
+    SAVE_INTERVAL = 50 # Cứ xong 5 ảnh thì lưu file 1 lần (Tránh mất điện/disconnect)
     count_since_save = 0
     # Vòng lặp chính (Có thanh tiến trình)
     for filename in tqdm(files, desc="🧠 Extracting Features", unit="img"):
@@ -335,7 +335,7 @@ def run_processing_pipeline(input_folder, output_json="data_vectors.json"):
                 batch_imgs = []
                 local_vectors_list = []
                 # OPTION: Gom [BATCH_SIZE] ảnh con rồi quăng vào hàm extract
-                BATCH_SIZE = 8 # Tùy VRAM, 8 là an toàn
+                BATCH_SIZE = 32 # Tùy VRAM, 8 là an toàn
 
                 for tile in tile_gen:
                     batch_imgs.append(tile)
@@ -427,8 +427,8 @@ def generate_layout(input_file="data_vectors.json", output_file="final_structure
     # OPTION
     reducer = umap.UMAP(
         n_components=3,    # Đích đến là 3D (x, y, z)
-        n_neighbors=30,    # Nhìn 30 hàng xóm để định vị (Số to -> Cấu trúc toàn cục rõ hơn)
-        min_dist=0.1,      # Khoảng cách tối thiểu giữa các điểm (Số nhỏ -> Cụm chặt)
+        n_neighbors=5,    # Nhìn 30 hàng xóm để định vị (Số to -> Cấu trúc toàn cục rõ hơn)
+        min_dist=0.5,      # Khoảng cách tối thiểu giữa các điểm (Số nhỏ -> Cụm chặt)
         metric='cosine',   # Đo góc (tốt nhất cho vector AI)
         random_state=42    # Cố định kết quả (Chạy 10 lần ra giống nhau)
     )
@@ -441,7 +441,7 @@ def generate_layout(input_file="data_vectors.json", output_file="final_structure
     # A. Scale về không gian hiển thị (Ví dụ từ -35 đến 35)
     # Đây là kích thước sân khấu của bạn trên Web
     # OPTION
-    SCENE_SIZE = 20 
+    SCENE_SIZE = 25 
     scaler = MinMaxScaler(feature_range=(-SCENE_SIZE, SCENE_SIZE))
     embedding_3d = scaler.fit_transform(embedding_3d)
     
@@ -488,7 +488,7 @@ if __name__ == "__main__":
     start_time = time.time()
     # --- BƯỚC 1: TẠO THUMBNAIL ---
     # (Nếu chạy rồi thì comment lại cho nhanh)
-    create_thumbnails(INPUT_FOLDER, THUMB_FOLDER)
+    # create_thumbnails(INPUT_FOLDER, THUMB_FOLDER)
     
     
     # --- BƯỚC 2: TRÍCH XUẤT ĐẶC TRƯNG (PIPELINE) ---

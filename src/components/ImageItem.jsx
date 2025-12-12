@@ -62,7 +62,7 @@ function ImageItem({ data, textureCache, setSelectedImage, config }) {
       materialRef.current._fadeProgress = THREE.MathUtils.damp(
         materialRef.current._fadeProgress,
         1,
-        1.5, // tốc độ chuyển
+        1, // tốc độ chuyển
         delta,
       );
 
